@@ -3,26 +3,13 @@ require 'minitest/unit'
 require 'orthrus/ssh/rack_app'
 require 'orthrus/ssh/http_agent'
 
+require 'sessions'
+
 class TestOrthrusSSHHTTPAgent < MiniTest::Unit::TestCase
   DATA_PATH = File.expand_path "../data", __FILE__
 
-  class Sessions
-    def new_session(pub)
-      @pub = pub
-      [1, "secret"]
-    end
-
-    def find_session(id)
-      ["secret", @pub]
-    end
-
-    def access_token
-      "1"
-    end
-  end
-
   def setup
-    @app = Orthrus::SSH::RackApp.new Sessions.new
+    @app = Orthrus::SSH::RackApp.new OrthrusTestSessions.new
     @server = Rack::Server.new :app => @app, :Port => 8787
 
     @old_stderr = $stderr
@@ -38,7 +25,7 @@ class TestOrthrusSSHHTTPAgent < MiniTest::Unit::TestCase
     @rsa = Orthrus::SSH.load_private @id_rsa
 
     @rsa_pub = Orthrus::SSH.load_public File.join(DATA_PATH, "id_rsa.pub")
-    @app.keys[@rsa.public_identity] = @rsa_pub
+    @app.sessions.add_key "evan", @rsa.public_identity, @rsa_pub
   end
 
   def teardown
@@ -52,7 +39,7 @@ class TestOrthrusSSHHTTPAgent < MiniTest::Unit::TestCase
 
     h.add_key @id_rsa
 
-    h.start
+    h.start "evan"
 
     assert_equal "1", h.access_token
   end
