@@ -133,6 +133,12 @@ module Orthrus::SSH
       [b.read_string, b.read_string]
     end
 
+    def hexsign(key, data)
+      type, sig = sign key, data
+
+      [type, [sig].pack("m").gsub("\n","")]
+    end
+
     private
 
     # Send a new packet of the given type, with the associated data.

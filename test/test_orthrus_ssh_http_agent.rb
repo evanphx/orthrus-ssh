@@ -1,7 +1,10 @@
 require 'minitest/unit'
+require 'minitest/autorun'
 
 require 'orthrus/ssh/rack_app'
 require 'orthrus/ssh/http_agent'
+
+require 'stringio'
 
 require 'sessions'
 
@@ -9,15 +12,16 @@ class TestOrthrusSSHHTTPAgent < MiniTest::Unit::TestCase
   DATA_PATH = File.expand_path "../data", __FILE__
 
   def setup
-    @app = Orthrus::SSH::RackApp.new OrthrusTestSessions.new
-    @server = Rack::Server.new :app => @app, :Port => 8787
+    @@app ||= Orthrus::SSH::RackApp.new OrthrusTestSessions.new
+    @app = @@app
+    @@server ||= begin
+                   s = Rack::Server.new :app => @app, :Port => 8787
+                   Thread.new { s.start }
+                   s
+                 end
 
     @old_stderr = $stderr
     $stderr = StringIO.new
-
-    t = @thread = Thread.new do
-      @server.start { |s| Thread.current[:server] = s }
-    end
 
     sleep 1
 
@@ -29,7 +33,7 @@ class TestOrthrusSSHHTTPAgent < MiniTest::Unit::TestCase
   end
 
   def teardown
-    @thread.kill
+    # @thread.kill
     $stderr = @old_stderr
   end
 
@@ -42,5 +46,26 @@ class TestOrthrusSSHHTTPAgent < MiniTest::Unit::TestCase
     h.start "evan"
 
     assert_equal "1", h.access_token
+  end
+
+  def test_access_token_from_agent
+    skip unless Orthrus::SSH::Agent.available?
+
+    begin
+      `ssh-add #{@id_rsa} 2>&1`
+
+      assert Orthrus::SSH::Agent.connect.identities.any? { |id|
+               id.public_identity == @rsa_pub.public_identity
+             }
+
+      url = URI.parse "http://127.0.0.1:8787/"
+      h = Orthrus::SSH::HTTPAgent.new url
+
+      h.start "evan"
+
+      assert_equal "1", h.access_token
+    ensure
+      `ssh-add -d #{@id_rsa} 2>&1`
+    end
   end
 end
