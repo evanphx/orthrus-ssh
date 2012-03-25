@@ -3,7 +3,11 @@ module Orthrus::SSH
     def initialize(k, digest)
       @key = k
       @digest = digest
+      @comment = nil
     end
+
+    attr_reader :key
+    attr_accessor :comment
 
     def rsa?
       @key.kind_of? OpenSSL::PKey::RSA
@@ -11,6 +15,15 @@ module Orthrus::SSH
 
     def dsa?
       @key.kind_of? OpenSSL::PKey::DSA
+    end
+
+    def fingerprint
+      blob = public_identity(false)
+      OpenSSL::Digest::MD5.hexdigest(blob).scan(/../).join(":")
+    end
+
+    def inspect
+      "#<#{self.class} #{fingerprint}>"
     end
   end
 

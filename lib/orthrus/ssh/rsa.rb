@@ -7,12 +7,18 @@ module Orthrus::SSH
       super k, OpenSSL::Digest::SHA1
     end
 
-    def public_identity
+    def public_identity(base64=true)
       d = Utils.write_string("ssh-rsa") +
           Utils.write_bignum(@key.e) +
           Utils.write_bignum(@key.n)
 
+      return d unless base64
+
       [d].pack("m").gsub("\n","")
+    end
+
+    def type
+      "ssh-rsa"
     end
   end
 

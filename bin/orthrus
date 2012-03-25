@@ -1,3 +1,16 @@
 #!/usr/bin/env ruby
 
-abort "you need to write me"
+case cmd = ARGV.shift
+when "ids"
+  require 'orthrus/ssh/agent'
+
+  agent = Orthrus::SSH::Agent.connect
+
+  puts "Agent identities:"
+  agent.identities.each do |i|
+    puts "#{i.type}: #{i.fingerprint}"
+  end
+
+else
+  abort "Unsupported option - #{cmd}"
+end

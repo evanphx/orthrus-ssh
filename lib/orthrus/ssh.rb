@@ -38,3 +38,11 @@ module Orthrus::SSH
   end
 
 end
+
+# For 1.8/1.9 compat
+class String
+  unless method_defined? :getbytpe
+    alias_method :getbyte, :[]
+  end
+end
+
