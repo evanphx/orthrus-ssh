@@ -30,6 +30,7 @@ A user authentication system built on SSH's key
 
 After checking out the source, run:
 
+  $ gem install hoe
   $ rake newb
 
 This task will install any missing dependencies, run the tests/specs,
