@@ -1,26 +1,30 @@
 = orthrus
 
-* FIX (url)
+* http://github.com/evanphx/orthrus
 
 == DESCRIPTION:
 
-FIX (describe your package)
+A user authentication system built on SSH's key
 
 == FEATURES/PROBLEMS:
 
-* FIX (list of features or problems)
+* Uses ssh keys to authenticate users
+* Can use the ssh-agent for added security
+* Includes HTTPAgent and sample RackApp
 
 == SYNOPSIS:
 
-  FIX (code sample of usage)
+  agent = Orthrus::SSH::HTTPAgent.new url
+  h.start user
+  p h.access_token
 
 == REQUIREMENTS:
 
-* FIX (list of requirements)
+* OpenSSL
 
 == INSTALL:
 
-* FIX (sudo gem install, anything else)
+* gem install orthrus
 
 == DEVELOPERS:
 
