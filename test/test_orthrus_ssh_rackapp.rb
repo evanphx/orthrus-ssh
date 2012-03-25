@@ -39,7 +39,7 @@ class TestOrthrusSSHRackApp < MiniTest::Unit::TestCase
 
   def test_call_requests_signature
     id = @rsa.public_identity
-    @app.sessions.add_key "evan", id, @rsa_pub
+    @app.sessions.add_key "evan", @rsa_pub
 
     env = {
       "rack.input" => StringIO.new,
@@ -60,7 +60,7 @@ class TestOrthrusSSHRackApp < MiniTest::Unit::TestCase
 
   def test_call_verifies_signature
     id = @rsa.public_identity
-    @app.sessions.add_key "evan", id, @rsa_pub
+    @app.sessions.add_key "evan", @rsa_pub
 
     env = {
       "rack.input" => StringIO.new,

@@ -25,7 +25,7 @@ class TestOrthrusSSHHTTPAgent < MiniTest::Unit::TestCase
     @rsa = Orthrus::SSH.load_private @id_rsa
 
     @rsa_pub = Orthrus::SSH.load_public File.join(DATA_PATH, "id_rsa.pub")
-    @app.sessions.add_key "evan", @rsa.public_identity, @rsa_pub
+    @app.sessions.add_key "evan", @rsa_pub
   end
 
   def teardown

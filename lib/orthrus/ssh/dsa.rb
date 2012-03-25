@@ -1,7 +1,7 @@
 require 'orthrus/ssh/key'
 
 module Orthrus::SSH
-  class DSAPrivateKey < PrivateKey
+  module DSA
     def initialize(k)
       super k, OpenSSL::Digest::DSS1
     end
@@ -15,6 +15,10 @@ module Orthrus::SSH
 
       [d].pack("m").gsub("\n","")
     end
+  end
+
+  class DSAPrivateKey < PrivateKey
+    include DSA
   end
 
   class DSAPublicKey < PublicKey
@@ -35,9 +39,7 @@ module Orthrus::SSH
       new k
     end
 
-    def initialize(k)
-      super k, OpenSSL::Digest::DSS1
-    end
+    include DSA
   end
 
 end
