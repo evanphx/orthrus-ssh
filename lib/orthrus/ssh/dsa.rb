@@ -1,5 +1,7 @@
 require 'orthrus/ssh/key'
 
+require 'orthrus/ssh/buffer'
+
 module Orthrus::SSH
   module DSA
     def initialize(k)
@@ -7,11 +9,13 @@ module Orthrus::SSH
     end
 
     def public_identity(base64=true)
-      d = Utils.write_string("ssh-dss") +
-          Utils.write_bignum(@key.p) +
-          Utils.write_bignum(@key.q) +
-          Utils.write_bignum(@key.g) +
-          Utils.write_bignum(@key.pub_key)
+      b = Buffer.from :string, "ssh-dss",
+                      :bignum, @key.p,
+                      :bignum, @key.q,
+                      :bignum, @key.g,
+                      :bignum, @key.pub_key
+
+      d = b.to_s
 
       return d unless base64
 
@@ -48,16 +52,18 @@ module Orthrus::SSH
     def self.parse(data)
       raw = data.unpack("m").first
 
-      type = Utils.read_string(raw)
+      b = Buffer.new raw
+
+      type = b.read_string
       unless type == "ssh-dss"
         raise "Unvalid key data"
       end
 
       k = OpenSSL::PKey::DSA.new
-      k.p = Utils.read_bignum raw
-      k.q = Utils.read_bignum raw
-      k.g = Utils.read_bignum raw
-      k.pub_key = Utils.read_bignum raw
+      k.p = b.read_bignum
+      k.q = b.read_bignum
+      k.g = b.read_bignum
+      k.pub_key = b.read_bignum
 
       new k
     end

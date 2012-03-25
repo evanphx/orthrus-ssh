@@ -1,14 +1,5 @@
 module Orthrus::SSH
   module Utils
-    def self.read_string(str)
-      i = str.slice!(0,4).unpack("N").first
-      str.slice! 0, i
-    end
-
-    def self.read_bignum(str)
-      OpenSSL::BN.new read_string(str), 2
-    end
-
     def self.write_bignum(bn)
       # Cribbed from net-ssh
       if bn.zero?

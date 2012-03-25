@@ -8,9 +8,11 @@ module Orthrus::SSH
     end
 
     def public_identity(base64=true)
-      d = Utils.write_string("ssh-rsa") +
-          Utils.write_bignum(@key.e) +
-          Utils.write_bignum(@key.n)
+      b = Buffer.from :string, "ssh-rsa",
+                      :bignum, @key.e,
+                      :bignum, @key.n
+
+      d = b.to_s
 
       return d unless base64
 
@@ -30,14 +32,16 @@ module Orthrus::SSH
     def self.parse(data)
       raw = data.unpack("m").first
 
-      type = Utils.read_string(raw)
+      b = Buffer.new raw
+
+      type = b.read_string
       unless type == "ssh-rsa"
         raise "Unvalid key data"
       end
 
       k = OpenSSL::PKey::RSA.new
-      k.e = Utils.read_bignum(raw)
-      k.n = Utils.read_bignum(raw)
+      k.e = b.read_bignum
+      k.n = b.read_bignum
 
       new k
     end

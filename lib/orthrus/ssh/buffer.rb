@@ -1,5 +1,7 @@
 require 'openssl'
 
+require 'orthrus/ssh/utils'
+
 # Adapted from buffer.rb in net-ssh
 
 module Orthrus::SSH
@@ -327,7 +329,7 @@ module Orthrus::SSH
     # checking is done to ensure that the arguments are, in fact, bignums.
     # Does not alter the read position. Returns the buffer object.
     def write_bignum(*n)
-      @content << n.map { |b| b.to_ssh }.join
+      @content << n.map { |b| Utils.write_bignum(b) }.join
       self
     end
 
