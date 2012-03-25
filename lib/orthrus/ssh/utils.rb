@@ -26,5 +26,10 @@ module Orthrus::SSH
     def self.write_string(str)
       [str.size].pack("N") + str
     end
+
+    def self.sha1_hash(data)
+      OpenSSL::Digest::SHA1.hexdigest data
+    end
+
   end
 end

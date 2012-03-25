@@ -39,12 +39,16 @@ module Orthrus::SSH
 
       session, nonce = @sessions.new_session(user, pub)
 
+      nonce = Rack::Utils.escape Utils.sha1_hash(nonce)
+
       form "code=check&session_id=#{session}&nonce=#{nonce}"
     end
 
     def verify(req)
       id = req.params["session_id"].to_i
       nonce, pub = @sessions.find_session(id)
+
+      nonce = Utils.sha1_hash(nonce)
 
       sig = req.params['sig']
 

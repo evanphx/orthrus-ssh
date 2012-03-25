@@ -51,7 +51,11 @@ class TestOrthrusSSHRackApp < MiniTest::Unit::TestCase
     assert_equal "application/x-www-form-urlencoded",
                  headers["Content-Type"]
 
-    assert_equal ["code=check&session_id=1&nonce=secret"], body
+    params = Rack::Utils.parse_query body.first
+
+    assert_equal "check", params['code']
+    assert_equal "1", params["session_id"]
+    refute params["nonce"].empty?
   end
 
   def test_call_verifies_signature
