@@ -1,4 +1,4 @@
-= orthrus
+= orthrus-ssh
 
 * http://github.com/evanphx/orthrus
 

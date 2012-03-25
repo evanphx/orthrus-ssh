@@ -7,6 +7,8 @@ require 'orthrus/ssh/dsa'
 require 'orthrus/ssh/utils'
 
 module Orthrus::SSH
+  VERSION = '0.5.0'
+
   def self.load_private(path)
     data = File.read(path)
     if data.index("-----BEGIN RSA PRIVATE KEY-----") == 0
