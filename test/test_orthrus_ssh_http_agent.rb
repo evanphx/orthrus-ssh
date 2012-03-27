@@ -7,11 +7,12 @@ require 'orthrus/ssh/http_agent'
 require 'stringio'
 
 require 'sessions'
+require 'orthrus_case'
 
-class TestOrthrusSSHHTTPAgent < MiniTest::Unit::TestCase
-  DATA_PATH = File.expand_path "../data", __FILE__
-
+class TestOrthrusSSHHTTPAgent < OrthrusTestCase
   def setup
+    super
+
     @@app ||= Orthrus::SSH::RackApp.new OrthrusTestSessions.new
     @app = @@app
     @@server ||= begin
@@ -25,10 +26,6 @@ class TestOrthrusSSHHTTPAgent < MiniTest::Unit::TestCase
 
     sleep 1
 
-    @id_rsa = File.join DATA_PATH, "id_rsa"
-    @rsa = Orthrus::SSH.load_private @id_rsa
-
-    @rsa_pub = Orthrus::SSH.load_public File.join(DATA_PATH, "id_rsa.pub")
     @app.sessions.add_key "evan", @rsa_pub
   end
 
@@ -41,7 +38,7 @@ class TestOrthrusSSHHTTPAgent < MiniTest::Unit::TestCase
     url = URI.parse "http://127.0.0.1:8787/"
     h = Orthrus::SSH::HTTPAgent.new url
 
-    h.add_key @id_rsa
+    h.load_key @id_rsa
 
     h.start "evan"
 
@@ -51,11 +48,7 @@ class TestOrthrusSSHHTTPAgent < MiniTest::Unit::TestCase
   def test_access_token_from_agent
     skip unless Orthrus::SSH::Agent.available?
 
-    begin
-      `chmod 0600 #{@id_rsa}; ssh-add #{@id_rsa} 2>&1`
-
-      fail unless $?.exitstatus == 0
-
+    added_to_agent @id_rsa do
       assert Orthrus::SSH::Agent.connect.identities.any? { |id|
                id.public_identity == @rsa_pub.public_identity
              }
@@ -66,8 +59,6 @@ class TestOrthrusSSHHTTPAgent < MiniTest::Unit::TestCase
       h.start "evan"
 
       assert_equal "1", h.access_token
-    ensure
-      `ssh-add -d #{@id_rsa} 2>&1`
     end
   end
 end

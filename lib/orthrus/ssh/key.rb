@@ -4,10 +4,11 @@ module Orthrus::SSH
       @key = k
       @digest = digest
       @comment = nil
+      @source = nil
     end
 
     attr_reader :key
-    attr_accessor :comment
+    attr_accessor :comment, :source
 
     def rsa?
       @key.kind_of? OpenSSL::PKey::RSA
@@ -25,25 +26,24 @@ module Orthrus::SSH
     def inspect
       "#<#{self.class} #{fingerprint}>"
     end
+
+    def ==(o)
+      return false unless o.kind_of? Orthrus::SSH::Key
+      @key.to_pem == o.key.to_pem
+    end
   end
 
   class PrivateKey < Key
-    def sign(data)
-      @key.sign @digest.new, data
-    end
-
-    def hexsign(data)
-      [sign(data)].pack("m").gsub("\n","")
+    def sign(data, b64armor=false)
+      s = @key.sign @digest.new, data
+      b64armor ? Utils.encode64(s) : s
     end
   end
 
   class PublicKey < Key
-    def verify(sign, data)
+    def verify(sign, data, b64armor=false)
+      sign = Utils.decode64 sign if b64armor
       @key.verify @digest.new, sign, data
-    end
-
-    def hexverify(sign, data)
-      verify sign.unpack("m").first, data
     end
   end
 

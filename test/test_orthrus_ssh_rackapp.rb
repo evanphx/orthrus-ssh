@@ -73,7 +73,7 @@ class TestOrthrusSSHRackApp < MiniTest::Unit::TestCase
 
     data = params['nonce']
 
-    sig = Rack::Utils.escape @rsa.hexsign(data)
+    sig = Rack::Utils.escape @rsa.sign(data, true)
 
     env["QUERY_STRING"] = "state=signed&sig=#{sig}&session_id=1"
 

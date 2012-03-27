@@ -7,16 +7,16 @@ require 'net/http'
 
 module Orthrus::SSH
   class HTTPAgent
-    def initialize(url)
+    def initialize(url, key_manager=nil)
       @url = url
-      @keys = []
+      @key_manager ||= KeyManager.new
       @access_token = nil
     end
 
     attr_reader :access_token
 
-    def add_key(key)
-      @keys << Orthrus::SSH.load_private(key)
+    def load_key(key)
+      @key_manager.load_key key
     end
 
     def check(user, k)
@@ -48,32 +48,16 @@ module Orthrus::SSH
     end
 
     def start(user)
-      @keys.each do |k|
+      @key_manager.each_key do |k|
         sid, data = check(user, k)
         next unless sid
 
-        sig = k.hexsign(data)
+        sig = @key_manager.sign k, data, true
 
         token = negotiate(k, sid, sig)
         if token
           @access_token = token
           return
-        end
-      end
-
-      if Agent.available?
-        agent = Agent.connect
-        agent.identities.each do |k|
-          sid, data = check(user, k)
-          next unless sid
-
-          type, sig = agent.hexsign k, data
-
-          token = negotiate(k, sid, sig)
-          if token
-            @access_token = token
-            return
-          end
         end
       end
 

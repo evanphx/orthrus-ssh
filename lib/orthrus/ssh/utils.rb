@@ -22,5 +22,12 @@ module Orthrus::SSH
       OpenSSL::Digest::SHA1.hexdigest data
     end
 
+    def self.encode64(data)
+      [data].pack("m").gsub("\n","")
+    end
+
+    def self.decode64(data)
+      data.unpack("m").first
+    end
   end
 end

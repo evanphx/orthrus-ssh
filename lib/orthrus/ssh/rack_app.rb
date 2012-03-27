@@ -52,7 +52,7 @@ module Orthrus::SSH
 
       sig = req.params['sig']
 
-      if pub.hexverify(sig, nonce)
+      if pub.verify(sig, nonce, true)
         form "code=verified&access_token=1"
       else
         form "code=fail"

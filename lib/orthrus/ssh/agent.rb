@@ -117,7 +117,7 @@ module Orthrus::SSH
 
     # Using the agent and the given public key, sign the given data. The
     # signature is returned in SSH2 format.
-    def sign(key, data)
+    def sign(key, data, b64armor=false)
       type, reply = send_and_wait(SSH2_AGENT_SIGN_REQUEST,
                                   :string, Buffer.from(:key, key),
                                   :string, data,
@@ -130,13 +130,12 @@ module Orthrus::SSH
       end
 
       b = Buffer.new reply.read_string
-      [b.read_string, b.read_string]
-    end
+      type = b.read_string
+      sign = b.read_string
 
-    def hexsign(key, data)
-      type, sig = sign key, data
+      sign = Utils.encode64 sign if b64armor
 
-      [type, [sig].pack("m").gsub("\n","")]
+      [type, sign]
     end
 
     private

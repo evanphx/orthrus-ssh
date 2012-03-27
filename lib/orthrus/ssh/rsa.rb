@@ -16,7 +16,7 @@ module Orthrus::SSH
 
       return d unless base64
 
-      [d].pack("m").gsub("\n","")
+      Utils.encode64 d
     end
 
     def type
@@ -30,7 +30,7 @@ module Orthrus::SSH
 
   class RSAPublicKey < PublicKey
     def self.parse(data)
-      raw = data.unpack("m").first
+      raw = Utils.decode64 data
 
       b = Buffer.new raw
 

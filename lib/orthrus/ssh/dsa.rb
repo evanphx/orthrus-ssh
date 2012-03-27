@@ -50,7 +50,7 @@ module Orthrus::SSH
 
   class DSAPublicKey < PublicKey
     def self.parse(data)
-      raw = data.unpack("m").first
+      raw = Utils.decode64 data
 
       b = Buffer.new raw
 
