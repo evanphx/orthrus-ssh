@@ -1,6 +1,6 @@
 = orthrus-ssh
 
-* http://github.com/evanphx/orthrus
+* http://github.com/evanphx/orthrus-ssh
 
 == DESCRIPTION:
 
