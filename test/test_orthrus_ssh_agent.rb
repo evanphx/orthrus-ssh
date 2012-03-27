@@ -26,6 +26,4 @@ class TestOrthrusSSHAgent < MiniTest::Unit::TestCase
 
     assert id.verify(sign, data)
   end
-
-
 end

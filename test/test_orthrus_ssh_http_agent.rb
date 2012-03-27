@@ -52,7 +52,9 @@ class TestOrthrusSSHHTTPAgent < MiniTest::Unit::TestCase
     skip unless Orthrus::SSH::Agent.available?
 
     begin
-      `ssh-add #{@id_rsa} 2>&1`
+      `chmod 0600 #{@id_rsa}; ssh-add #{@id_rsa} 2>&1`
+
+      fail unless $?.exitstatus == 0
 
       assert Orthrus::SSH::Agent.connect.identities.any? { |id|
                id.public_identity == @rsa_pub.public_identity

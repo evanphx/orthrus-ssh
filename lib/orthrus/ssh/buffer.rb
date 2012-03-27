@@ -72,6 +72,7 @@ module Orthrus::SSH
     # is initialized to the beginning of the buffer.
     def initialize(content="")
       @content = content.to_s
+      @content.force_encoding "ASCII-8BIT" if @content.respond_to? :force_encoding
       @position = 0
     end
 
@@ -89,6 +90,10 @@ module Orthrus::SSH
     # Returns a copy of the buffer's content.
     def to_s
       (@content || "").dup
+    end
+
+    def inspect
+      "#<#{self.class} #{@content.size} bytes>"
     end
 
     # Compares the contents of the two buffers, returning +true+ only if they

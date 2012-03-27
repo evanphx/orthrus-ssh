@@ -6,7 +6,7 @@ module Orthrus::SSH
         return [0].pack("N")
       else
         buf = bn.to_s(2)
-        if buf[0][7] == 1
+        if buf.getbyte(0)[7] == 1
           return [buf.length+1, 0, buf].pack("NCA*")
         else
           return [buf.length, buf].pack("NA*")
