@@ -25,7 +25,7 @@ module Orthrus::SSH
     def form(body)
       [200,
        { "Content-Type" => "application/x-www-form-urlencoded" },
-       [body]
+       [Rack::Utils.build_query(body)]
       ]
     end
 
@@ -34,14 +34,14 @@ module Orthrus::SSH
       id = req.params["id"]
 
       unless pub = @sessions.find_key(user, id)
-        return form("code=unknown")
+        return form :code => "unknown"
       end
 
       session, nonce = @sessions.new_session(user, pub)
 
-      nonce = Rack::Utils.escape Utils.sha1_hash(nonce)
+      nonce = Utils.sha1_hash(nonce)
 
-      form "code=check&session_id=#{session}&nonce=#{nonce}"
+      form :code => 'check', :session_id => session, :nonce => nonce
     end
 
     def verify(req)
@@ -52,10 +52,12 @@ module Orthrus::SSH
 
       sig = req.params['sig']
 
+      token = @sessions.new_access_token(id)
+
       if pub.verify(sig, nonce, true)
-        form "code=verified&access_token=1"
+        form :code => 'verified', :access_token => token
       else
-        form "code=fail"
+        form :code => "fail"
       end
     end
   end

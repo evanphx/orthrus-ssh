@@ -34,7 +34,8 @@ class TestOrthrusSSHRackApp < MiniTest::Unit::TestCase
     assert_equal "application/x-www-form-urlencoded",
                  headers["Content-Type"]
 
-    assert_equal "code=unknown", body[0]
+    params = Rack::Utils.parse_query body[0]
+    assert_equal "unknown", params['code']
   end
 
   def test_call_requests_signature
@@ -79,6 +80,9 @@ class TestOrthrusSSHRackApp < MiniTest::Unit::TestCase
 
     code, headers, body = @app.call(env)
 
-    assert_equal ["code=verified&access_token=1"], body
+    params = Rack::Utils.parse_query body.first
+
+    assert_equal "verified", params['code']
+    assert_equal "1", params["access_token"]
   end
 end

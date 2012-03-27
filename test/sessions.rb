@@ -21,7 +21,7 @@ class OrthrusTestSessions
     ["secret", @pub]
   end
 
-  def access_token
+  def new_access_token(session_id)
     1
   end
 end
