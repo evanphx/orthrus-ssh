@@ -7,7 +7,7 @@ require 'orthrus/ssh/dsa'
 require 'orthrus/ssh/utils'
 
 module Orthrus::SSH
-  VERSION = '0.5.1'
+  VERSION = '0.6.0'
 
   def self.load_private(path)
     data = File.read(path)
